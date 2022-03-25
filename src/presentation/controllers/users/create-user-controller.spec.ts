@@ -1,3 +1,5 @@
+import { User } from '../../../domain/models/user'
+import { CreateUser, UserData } from '../../../domain/useCases/users/create-user'
 import { badRequest } from '../../helpers/http-helpers'
 import { EmailValidator } from '../../protocols/email-validator'
 import { CreateUserController } from './create-user-controller'
@@ -5,7 +7,26 @@ import { CreateUserController } from './create-user-controller'
 type SutTypes = {
   sut: CreateUserController;
   emailValidatorStub: EmailValidator
+  createUserStub: CreateUser
 };
+
+const makeCreateUser = (): CreateUser => {
+  class CreateUserStub implements CreateUser {
+    execute (userData: UserData): Promise<User> {
+      const fakeUser: User = {
+        id: 1,
+        name: 'fake_name',
+        email: 'fake_email',
+        cpfCnpj: 'fake_cpfCnpj',
+        password: 'fake_password',
+        id_bank_account: 1
+      }
+      return new Promise(resolve => resolve(fakeUser))
+    }
+  }
+
+  return new CreateUserStub()
+}
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
@@ -19,9 +40,10 @@ const makeEmailValidator = (): EmailValidator => {
 
 const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidator()
-  const sut = new CreateUserController(emailValidatorStub)
+  const createUserStub = makeCreateUser()
+  const sut = new CreateUserController(emailValidatorStub, createUserStub)
 
-  return { sut, emailValidatorStub }
+  return { sut, emailValidatorStub, createUserStub }
 }
 
 describe('Create User Controller', () => {
@@ -145,5 +167,29 @@ describe('Create User Controller', () => {
 
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body.message).toBe('Internal Error Server')
+  })
+
+  test('Should call CreateUser with correct values', async () => {
+    const { sut, createUserStub } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email',
+        cpfCnpj: 'any_cpfCnpj',
+        password: 'any_password'
+      }
+    }
+
+    const createUserSpy = jest.spyOn(createUserStub, 'execute')
+
+    sut.handle(httpRequest)
+
+    expect(createUserSpy).toBeCalledWith({
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    })
   })
 })
