@@ -15,5 +15,23 @@ describe('Create User Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.message).toBe('Missing param: name')
+  })
+
+  test('Should return 400 if no email is provided', async () => {
+    const sut = new CreateUserController()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        cpf_cnpj: 'any_cpf_cnpj',
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.message).toBe('Missing param: email')
   })
 })
