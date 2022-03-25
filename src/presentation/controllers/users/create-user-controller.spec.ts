@@ -1,3 +1,4 @@
+import { badRequest } from '../../helpers/http-helpers'
 import { CreateUserController } from './create-user-controller'
 
 describe('Create User Controller', () => {
@@ -7,15 +8,14 @@ describe('Create User Controller', () => {
     const httpRequest = {
       body: {
         email: 'any_email',
-        cpf_cnpj: 'any_cpf_cnpj',
+        cpfCnpj: 'any_cpfCnpj',
         password: 'any_password'
       }
     }
 
     const httpResponse = sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body.message).toBe('Missing param: name')
+    expect(httpResponse).toEqual(badRequest('Missing param: name'))
   })
 
   test('Should return 400 if no email is provided', async () => {
@@ -24,15 +24,14 @@ describe('Create User Controller', () => {
     const httpRequest = {
       body: {
         name: 'any_name',
-        cpf_cnpj: 'any_cpf_cnpj',
+        cpfCnpj: 'any_cpfCnpj',
         password: 'any_password'
       }
     }
 
     const httpResponse = sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body.message).toBe('Missing param: email')
+    expect(httpResponse).toEqual(badRequest('Missing param: email'))
   })
 
   test('Should return 400 if no cpf or cnpj is provided', async () => {
@@ -48,8 +47,7 @@ describe('Create User Controller', () => {
 
     const httpResponse = sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body.message).toBe('Missing param: CPF/CNPJ')
+    expect(httpResponse).toEqual(badRequest('Missing param: cpfCnpj'))
   })
 
   test('Should return 400 if no password is provided', async () => {
@@ -59,13 +57,12 @@ describe('Create User Controller', () => {
       body: {
         name: 'any_name',
         email: 'any_email',
-        cpf_cnpj: 'any_cpf_cnpj'
+        cpfCnpj: 'any_cpfCnpj'
       }
     }
 
     const httpResponse = sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body.message).toBe('Missing param: password')
+    expect(httpResponse).toEqual(badRequest('Missing param: password'))
   })
 })

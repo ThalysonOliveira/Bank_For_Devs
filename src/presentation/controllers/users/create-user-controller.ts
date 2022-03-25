@@ -1,33 +1,16 @@
+import { badRequest } from '../../helpers/http-helpers'
 import { Controller } from '../../protocols/controller'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
 
 class CreateUserController implements Controller {
   handle (httpRequest: HttpRequest): HttpResponse {
-    if (!httpRequest.body.name) {
-      return {
-        statusCode: 400,
-        body: { message: 'Missing param: name' }
-      }
-    }
+    const requiredFields = ['name', 'email', 'cpfCnpj', 'password']
 
-    if (!httpRequest.body.email) {
-      return {
-        statusCode: 400,
-        body: { message: 'Missing param: email' }
-      }
-    }
+    for (const field of requiredFields) {
+      console.log(field)
 
-    if (!httpRequest.body.cpf_cnpj) {
-      return {
-        statusCode: 400,
-        body: { message: 'Missing param: CPF/CNPJ' }
-      }
-    }
-
-    if (!httpRequest.body.password) {
-      return {
-        statusCode: 400,
-        body: { message: 'Missing param: password' }
+      if (!httpRequest.body[field]) {
+        return badRequest(`Missing param: ${field}`)
       }
     }
 
