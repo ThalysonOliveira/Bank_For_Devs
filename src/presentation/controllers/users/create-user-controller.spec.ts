@@ -126,4 +126,24 @@ describe('Create User Controller', () => {
 
     expect(httpResponse).toEqual(badRequest('Invalid email'))
   })
+
+  test('Should return 500 if EmailValidator throws', async () => {
+    const { sut, emailValidatorStub } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email',
+        cpfCnpj: 'any_cpfCnpj',
+        password: 'any_password'
+      }
+    }
+
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => { throw new Error() })
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body.message).toBe('Internal Error Server')
+  })
 })
