@@ -24,6 +24,13 @@ class CreateUserController implements Controller {
       }
     }
 
+    if (!httpRequest.body.password) {
+      return {
+        statusCode: 400,
+        body: { message: 'Missing param: password' }
+      }
+    }
+
     return {
       statusCode: 201
     }
