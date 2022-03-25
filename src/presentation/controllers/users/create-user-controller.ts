@@ -10,14 +10,14 @@ class CreateUserController implements Controller {
     const requiredFields = ['name', 'email', 'cpfCnpj', 'password']
 
     for (const field of requiredFields) {
-      console.log(field)
-
       if (!httpRequest.body[field]) {
         return badRequest(`Missing param: ${field}`)
       }
     }
 
-    const emailIsValid = await this.emailValidator.isValid(httpRequest.body.email)
+    const emailIsValid = this.emailValidator.isValid(httpRequest.body.email)
+
+    if (!emailIsValid) return badRequest('Invalid email')
 
     return {
       statusCode: 201

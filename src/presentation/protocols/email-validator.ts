@@ -1,5 +1,5 @@
 interface EmailValidator{
-  isValid : (value: string)=> Promise<boolean>
+  isValid : (value: string)=> boolean
 }
 
 export { EmailValidator }
