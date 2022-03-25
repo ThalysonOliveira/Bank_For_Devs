@@ -13,6 +13,13 @@ class CreateUserController {
         message: 'Missing param: email'
       }
     }
+
+    if (!httpRequest.body.cpf_cnpj) {
+      return {
+        statusCode: 400,
+        message: 'Missing param: CPF/CNPJ'
+      }
+    }
   }
 }
 
