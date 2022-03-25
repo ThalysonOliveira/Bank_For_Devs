@@ -1,10 +1,11 @@
+import { CreateUser } from '../../../domain/useCases/users/create-user'
 import { badRequest } from '../../helpers/http-helpers'
 import { Controller } from '../../protocols/controller'
 import { EmailValidator } from '../../protocols/email-validator'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
 
 class CreateUserController implements Controller {
-  constructor (private emailValidator:EmailValidator) {}
+  constructor (private emailValidator:EmailValidator, private createUser: CreateUser) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
@@ -19,6 +20,10 @@ class CreateUserController implements Controller {
       const emailIsValid = this.emailValidator.isValid(httpRequest.body.email)
 
       if (!emailIsValid) return badRequest('Invalid email')
+
+      const { name, email, cpfCnpj, password } = httpRequest.body
+
+      await this.createUser.execute({ name, email, cpfCnpj, password })
 
       return {
         statusCode: 201
