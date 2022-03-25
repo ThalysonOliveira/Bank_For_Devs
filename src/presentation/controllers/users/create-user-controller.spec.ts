@@ -183,7 +183,7 @@ describe('Create User Controller', () => {
 
     const createUserSpy = jest.spyOn(createUserStub, 'execute')
 
-    sut.handle(httpRequest)
+    await sut.handle(httpRequest)
 
     expect(createUserSpy).toBeCalledWith({
       name: 'any_name',
@@ -191,5 +191,25 @@ describe('Create User Controller', () => {
       cpfCnpj: 'any_cpfCnpj',
       password: 'any_password'
     })
+  })
+
+  test('Should return 500 if CreateUser throws', async () => {
+    const { sut, createUserStub } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email',
+        cpfCnpj: 'any_cpfCnpj',
+        password: 'any_password'
+      }
+    }
+
+    jest.spyOn(createUserStub, 'execute').mockImplementationOnce(() => { throw new Error() })
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body.message).toBe('Internal Error Server')
   })
 })
