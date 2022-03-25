@@ -9,8 +9,8 @@ type SutTypes = {
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
-    async isValid (value: string): Promise<boolean> {
-      return new Promise(resolve => true)
+    isValid (value: string): boolean {
+      return true
     }
   }
 
@@ -106,5 +106,24 @@ describe('Create User Controller', () => {
     sut.handle(httpRequest)
 
     expect(emailValidatorSpy).toBeCalledWith('any_email')
+  })
+
+  test('Should return 400 if invalid email is provided', async () => {
+    const { sut, emailValidatorStub } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'invalid_email',
+        cpfCnpj: 'any_cpfCnpj',
+        password: 'any_password'
+      }
+    }
+
+    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse).toEqual(badRequest('Invalid email'))
   })
 })
