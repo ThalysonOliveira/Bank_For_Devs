@@ -5,7 +5,10 @@ import { EmailValidator } from '../../protocols/email-validator'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
 
 class CreateUserController implements Controller {
-  constructor (private emailValidator:EmailValidator, private createUser: CreateUser) {}
+  constructor (
+    private emailValidator: EmailValidator,
+    private createUser: CreateUser
+  ) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
@@ -29,12 +32,12 @@ class CreateUserController implements Controller {
         statusCode: 201
       }
     } catch (error) {
-      return ({
+      return {
         statusCode: 500,
         body: {
           message: 'Internal Error Server'
         }
-      })
+      }
     }
   }
 }
