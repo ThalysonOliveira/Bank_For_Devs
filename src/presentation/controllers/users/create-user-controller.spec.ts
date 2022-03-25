@@ -12,10 +12,10 @@ describe('Create User Controller', () => {
       }
     }
 
-    const httpResponse = await sut.handle(httpRequest)
+    const httpResponse = sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.message).toBe('Missing param: name')
+    expect(httpResponse.body.message).toBe('Missing param: name')
   })
 
   test('Should return 400 if no email is provided', async () => {
@@ -29,10 +29,10 @@ describe('Create User Controller', () => {
       }
     }
 
-    const httpResponse = await sut.handle(httpRequest)
+    const httpResponse = sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.message).toBe('Missing param: email')
+    expect(httpResponse.body.message).toBe('Missing param: email')
   })
 
   test('Should return 400 if no cpf or cnpj is provided', async () => {
@@ -46,9 +46,9 @@ describe('Create User Controller', () => {
       }
     }
 
-    const httpResponse = await sut.handle(httpRequest)
+    const httpResponse = sut.handle(httpRequest)
 
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.message).toBe('Missing param: CPF/CNPJ')
+    expect(httpResponse.body.message).toBe('Missing param: CPF/CNPJ')
   })
 })
