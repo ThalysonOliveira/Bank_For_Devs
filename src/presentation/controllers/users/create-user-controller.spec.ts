@@ -1,14 +1,25 @@
 import { User } from '../../../domain/models/user'
 import { CreateUser, UserData } from '../../../domain/useCases/users/create-user'
 import { badRequest } from '../../helpers/http-helpers'
+import { CpfValidator } from '../../protocols/cpf-validator'
 import { EmailValidator } from '../../protocols/email-validator'
 import { CreateUserController } from './create-user-controller'
 
 type SutTypes = {
   sut: CreateUserController;
-  emailValidatorStub: EmailValidator
-  createUserStub: CreateUser
+  emailValidatorStub: EmailValidator;
+  createUserStub: CreateUser;
+  cpfValidatorStub: CpfValidator;
 };
+
+const makeCpfValidator = ():CpfValidator => {
+  class CpfValidatorStub implements CpfValidator {
+    isValid (value: string):boolean {
+      return true
+    }
+  }
+  return new CpfValidatorStub()
+}
 
 const makeCreateUser = (): CreateUser => {
   class CreateUserStub implements CreateUser {
@@ -39,11 +50,12 @@ const makeEmailValidator = (): EmailValidator => {
 }
 
 const makeSut = (): SutTypes => {
+  const cpfValidatorStub = makeCpfValidator()
   const emailValidatorStub = makeEmailValidator()
   const createUserStub = makeCreateUser()
-  const sut = new CreateUserController(emailValidatorStub, createUserStub)
+  const sut = new CreateUserController(emailValidatorStub, cpfValidatorStub, createUserStub)
 
-  return { sut, emailValidatorStub, createUserStub }
+  return { sut, emailValidatorStub, createUserStub, cpfValidatorStub }
 }
 
 describe('Create User Controller', () => {
@@ -230,5 +242,24 @@ describe('Create User Controller', () => {
     await sut.handle(httpRequest)
 
     expect(sutSpy).toHaveBeenCalledWith('valid_cpfCnpj')
+  })
+
+  test('Should call CpfValidator with correct values', async () => {
+    const { sut, cpfValidatorStub } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email',
+        cpfCnpj: 'any_cpfCnpj',
+        password: 'any_password'
+      }
+    }
+
+    const cpfValidatorSpy = jest.spyOn(cpfValidatorStub, 'isValid')
+
+    await sut.handle(httpRequest)
+
+    expect(cpfValidatorSpy).toHaveBeenCalledWith('any_cpfCnpj')
   })
 })
