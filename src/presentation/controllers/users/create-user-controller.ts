@@ -1,5 +1,6 @@
 import { CreateUser } from '../../../domain/useCases/users/create-user'
 import { badRequest } from '../../helpers/http-helpers'
+import { CnpjValidator } from '../../protocols/cnpj-validator'
 import { Controller } from '../../protocols/controller'
 import { CpfValidator } from '../../protocols/cpf-validator'
 import { EmailValidator } from '../../protocols/email-validator'
@@ -9,6 +10,7 @@ class CreateUserController implements Controller {
   constructor (
     private emailValidator: EmailValidator,
     private cpfValidator: CpfValidator,
+    private cnpjValidator: CnpjValidator,
     private createUser: CreateUser
   ) {}
 
@@ -33,6 +35,8 @@ class CreateUserController implements Controller {
       const isValidCpf = this.cpfValidator.isValid(cpfCnpj)
 
       if (isCnpjOuCnpj && !isValidCpf) return badRequest('Invalid cpf')
+
+      this.cnpjValidator.isValid(cpfCnpj)
 
       await this.createUser.execute({ name, email, cpfCnpj, password })
 
