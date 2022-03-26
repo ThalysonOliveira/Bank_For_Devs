@@ -212,4 +212,23 @@ describe('Create User Controller', () => {
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body.message).toBe('Internal Error Server')
   })
+
+  test('Should call isCnpjOuCnpj with correct values', async () => {
+    const { sut } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email',
+        cpfCnpj: 'valid_cpfCnpj',
+        password: 'any_password'
+      }
+    }
+
+    const sutSpy = jest.spyOn(sut, 'isCnpjOuCnpj')
+
+    await sut.handle(httpRequest)
+
+    expect(sutSpy).toHaveBeenCalledWith('valid_cpfCnpj')
+  })
 })
