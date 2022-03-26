@@ -30,7 +30,9 @@ class CreateUserController implements Controller {
 
       const isCnpjOuCnpj = this.isCnpjOuCnpj(cpfCnpj)
 
-      this.cpfValidator.isValid(cpfCnpj)
+      const isValidCpf = this.cpfValidator.isValid(cpfCnpj)
+
+      if (isCnpjOuCnpj && !isValidCpf) return badRequest('Invalid cpf')
 
       await this.createUser.execute({ name, email, cpfCnpj, password })
 
