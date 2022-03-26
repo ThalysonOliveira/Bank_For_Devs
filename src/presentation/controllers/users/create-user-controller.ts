@@ -1,12 +1,14 @@
 import { CreateUser } from '../../../domain/useCases/users/create-user'
 import { badRequest } from '../../helpers/http-helpers'
 import { Controller } from '../../protocols/controller'
+import { CpfValidator } from '../../protocols/cpf-validator'
 import { EmailValidator } from '../../protocols/email-validator'
 import { HttpRequest, HttpResponse } from '../../protocols/http'
 
 class CreateUserController implements Controller {
   constructor (
     private emailValidator: EmailValidator,
+    private cpfValidator: CpfValidator,
     private createUser: CreateUser
   ) {}
 
@@ -27,6 +29,8 @@ class CreateUserController implements Controller {
       const { name, email, cpfCnpj, password } = httpRequest.body
 
       const isCnpjOuCnpj = this.isCnpjOuCnpj(cpfCnpj)
+
+      this.cpfValidator.isValid(cpfCnpj)
 
       await this.createUser.execute({ name, email, cpfCnpj, password })
 
