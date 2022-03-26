@@ -248,7 +248,7 @@ describe('Create User Controller', () => {
     expect(httpResponse.body.message).toBe('Internal Error Server')
   })
 
-  test('Should call isCnpjOuCnpj with correct values', async () => {
+  test('Should call isCpfOrCnpj with correct values', async () => {
     const { sut } = makeSut()
 
     const httpRequest = {
@@ -260,7 +260,7 @@ describe('Create User Controller', () => {
       }
     }
 
-    const sutSpy = jest.spyOn(sut, 'isCnpjOuCnpj')
+    const sutSpy = jest.spyOn(sut, 'isCpfOrCnpj')
 
     await sut.handle(httpRequest)
 
@@ -298,7 +298,7 @@ describe('Create User Controller', () => {
       }
     }
 
-    jest.spyOn(sut, 'isCnpjOuCnpj').mockReturnValueOnce(true)
+    jest.spyOn(sut, 'isCpfOrCnpj').mockReturnValueOnce(true)
     jest.spyOn(cpfValidatorStub, 'isValid').mockReturnValueOnce(false)
 
     const httpResponse = await sut.handle(httpRequest)
@@ -337,7 +337,7 @@ describe('Create User Controller', () => {
       }
     }
 
-    jest.spyOn(sut, 'isCnpjOuCnpj').mockReturnValueOnce(false)
+    jest.spyOn(sut, 'isCpfOrCnpj').mockReturnValueOnce(false)
     jest.spyOn(cnpjValidatorStub, 'isValid').mockReturnValueOnce(false)
 
     const httpResponse = await sut.handle(httpRequest)

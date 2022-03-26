@@ -30,15 +30,15 @@ class CreateUserController implements Controller {
 
       const { name, email, cpfCnpj, password } = httpRequest.body
 
-      const isCnpjOuCnpj = this.isCnpjOuCnpj(cpfCnpj)
+      const isCpfOrCnpj = this.isCpfOrCnpj(cpfCnpj)
 
       const isValidCpf = this.cpfValidator.isValid(cpfCnpj)
 
-      if (isCnpjOuCnpj && !isValidCpf) return badRequest('Invalid cpf')
+      if (isCpfOrCnpj && !isValidCpf) return badRequest('Invalid cpf')
 
       const isValidCnpj = this.cnpjValidator.isValid(cpfCnpj)
 
-      if (!isCnpjOuCnpj && !isValidCnpj) return badRequest('Invalid cnpj')
+      if (!isCpfOrCnpj && !isValidCnpj) return badRequest('Invalid cnpj')
 
       await this.createUser.execute({ name, email, cpfCnpj, password })
 
@@ -55,7 +55,7 @@ class CreateUserController implements Controller {
     }
   }
 
-  isCnpjOuCnpj (value: string): boolean {
+  isCpfOrCnpj (value: string): boolean {
     return value.length === 11 ? true : false
   }
 }
