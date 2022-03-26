@@ -262,4 +262,24 @@ describe('Create User Controller', () => {
 
     expect(cpfValidatorSpy).toHaveBeenCalledWith('any_cpfCnpj')
   })
+
+  test('Should return 400 if invalid cpf is provided', async () => {
+    const { sut, cpfValidatorStub } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email',
+        cpfCnpj: 'invalid_cpf',
+        password: 'any_password'
+      }
+    }
+
+    jest.spyOn(sut, 'isCnpjOuCnpj').mockReturnValueOnce(true)
+    jest.spyOn(cpfValidatorStub, 'isValid').mockReturnValueOnce(false)
+
+    const httpResponse = await sut.handle(httpRequest)
+
+    expect(httpResponse).toEqual(badRequest('Invalid cpf'))
+  })
 })
