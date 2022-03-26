@@ -1,6 +1,7 @@
 import { User } from '../../../domain/models/user'
 import { CreateUser, UserData } from '../../../domain/useCases/users/create-user'
 import { badRequest } from '../../helpers/http-helpers'
+import { CnpjValidator } from '../../protocols/cnpj-validator'
 import { CpfValidator } from '../../protocols/cpf-validator'
 import { EmailValidator } from '../../protocols/email-validator'
 import { CreateUserController } from './create-user-controller'
@@ -10,6 +11,7 @@ type SutTypes = {
   emailValidatorStub: EmailValidator;
   createUserStub: CreateUser;
   cpfValidatorStub: CpfValidator;
+  cnpjValidatorStub: CnpjValidator
 };
 
 const makeCpfValidator = ():CpfValidator => {
@@ -19,6 +21,15 @@ const makeCpfValidator = ():CpfValidator => {
     }
   }
   return new CpfValidatorStub()
+}
+
+const makeCnpjValidator = (): CnpjValidator => {
+  class CnpjValidatorStub implements CnpjValidator {
+    isValid (value: string):boolean {
+      return true
+    }
+  }
+  return new CnpjValidatorStub()
 }
 
 const makeCreateUser = (): CreateUser => {
@@ -51,11 +62,23 @@ const makeEmailValidator = (): EmailValidator => {
 
 const makeSut = (): SutTypes => {
   const cpfValidatorStub = makeCpfValidator()
+  const cnpjValidatorStub = makeCnpjValidator()
   const emailValidatorStub = makeEmailValidator()
   const createUserStub = makeCreateUser()
-  const sut = new CreateUserController(emailValidatorStub, cpfValidatorStub, createUserStub)
+  const sut = new CreateUserController(
+    emailValidatorStub,
+    cpfValidatorStub,
+    cnpjValidatorStub,
+    createUserStub
+  )
 
-  return { sut, emailValidatorStub, createUserStub, cpfValidatorStub }
+  return {
+    sut,
+    emailValidatorStub,
+    createUserStub,
+    cpfValidatorStub,
+    cnpjValidatorStub
+  }
 }
 
 describe('Create User Controller', () => {
@@ -281,5 +304,24 @@ describe('Create User Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     expect(httpResponse).toEqual(badRequest('Invalid cpf'))
+  })
+
+  test('Should call CnpjValidator with correct values', async () => {
+    const { sut, cnpjValidatorStub } = makeSut()
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email',
+        cpfCnpj: 'any_cpfCnpj',
+        password: 'any_password'
+      }
+    }
+
+    const cnpjValidatorSpy = jest.spyOn(cnpjValidatorStub, 'isValid')
+
+    await sut.handle(httpRequest)
+
+    expect(cnpjValidatorSpy).toHaveBeenCalledWith('any_cpfCnpj')
   })
 })
