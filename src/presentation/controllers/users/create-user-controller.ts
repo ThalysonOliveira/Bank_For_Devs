@@ -26,6 +26,8 @@ class CreateUserController implements Controller {
 
       const { name, email, cpfCnpj, password } = httpRequest.body
 
+      const isCnpjOuCnpj = this.isCnpjOuCnpj(cpfCnpj)
+
       await this.createUser.execute({ name, email, cpfCnpj, password })
 
       return {
@@ -39,6 +41,10 @@ class CreateUserController implements Controller {
         }
       }
     }
+  }
+
+  isCnpjOuCnpj (value: string): boolean {
+    return value.length === 11 ? true : false
   }
 }
 
