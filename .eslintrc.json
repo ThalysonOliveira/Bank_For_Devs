@@ -17,6 +17,7 @@
   "rules": {
     "no-undef": "off",
     "no-useless-constructor": "off",
-    "camelcase":"off"
+    "camelcase":"off",
+    "no-unneeded-ternary":"off"
   }
 }
