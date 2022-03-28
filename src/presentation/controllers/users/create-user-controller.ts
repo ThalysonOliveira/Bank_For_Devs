@@ -1,5 +1,5 @@
 import { CreateUser } from '../../../domain/useCases/users/create-user'
-import { badRequest } from '../../helpers/http-helpers'
+import { badRequest, serverError } from '../../helpers/http-helpers'
 import { CnpjValidator } from '../../protocols/cnpj-validator'
 import { Controller } from '../../protocols/controller'
 import { CpfValidator } from '../../protocols/cpf-validator'
@@ -46,12 +46,7 @@ class CreateUserController implements Controller {
         statusCode: 201
       }
     } catch (error) {
-      return {
-        statusCode: 500,
-        body: {
-          message: 'Internal Error Server'
-        }
-      }
+      return serverError(error as Error)
     }
   }
 

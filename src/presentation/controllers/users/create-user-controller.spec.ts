@@ -1,6 +1,6 @@
 import { User } from '../../../domain/models/user'
 import { CreateUser, UserData } from '../../../domain/useCases/users/create-user'
-import { badRequest } from '../../helpers/http-helpers'
+import { badRequest, serverError } from '../../helpers/http-helpers'
 import { CnpjValidator } from '../../protocols/cnpj-validator'
 import { CpfValidator } from '../../protocols/cpf-validator'
 import { EmailValidator } from '../../protocols/email-validator'
@@ -200,8 +200,7 @@ describe('Create User Controller', () => {
 
     const httpResponse = await sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body.message).toBe('Internal Error Server')
+    expect(httpResponse).toEqual(serverError())
   })
 
   test('Should call CreateUser with correct values', async () => {
@@ -244,8 +243,7 @@ describe('Create User Controller', () => {
 
     const httpResponse = await sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body.message).toBe('Internal Error Server')
+    expect(httpResponse).toEqual(serverError())
   })
 
   test('Should call isCpfOrCnpj with correct values', async () => {
@@ -346,7 +344,7 @@ describe('Create User Controller', () => {
   })
 
   test('Should return 500 if CpfValidator throws', async () => {
-    const { sut, cnpjValidatorStub } = makeSut()
+    const { sut, cpfValidatorStub } = makeSut()
 
     const httpRequest = {
       body: {
@@ -357,12 +355,11 @@ describe('Create User Controller', () => {
       }
     }
 
-    jest.spyOn(cnpjValidatorStub, 'isValid').mockImplementationOnce(() => { throw new Error() })
+    jest.spyOn(cpfValidatorStub, 'isValid').mockImplementationOnce(() => { throw new Error() })
 
     const httpResponse = await sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body.message).toBe('Internal Error Server')
+    expect(httpResponse).toEqual(serverError())
   })
 
   test('Should return 500 if CnpjValidator throws', async () => {
@@ -381,7 +378,6 @@ describe('Create User Controller', () => {
 
     const httpResponse = await sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body.message).toBe('Internal Error Server')
+    expect(httpResponse).toEqual(serverError())
   })
 })

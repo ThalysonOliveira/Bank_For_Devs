@@ -11,4 +11,15 @@ const badRequest = (message: string, data?: unknown): HttpResponse => {
   })
 }
 
-export { badRequest }
+const serverError = (error?: Error):HttpResponse => {
+  console.log(error?.stack)
+
+  return ({
+    statusCode: 500,
+    body: {
+      message: 'Internal error server'
+    }
+  })
+}
+
+export { badRequest, serverError }
