@@ -27,4 +27,14 @@ describe('Cpf Validator Adapter', () => {
 
     expect(isValid).toBe(true)
   })
+
+  test('Should CpfValidatorAdapter call cpf-cnpj-validator with correct value', () => {
+    const sut = new CpfValidatorAdapter()
+
+    const cpfCnpjValidatorSpy = jest.spyOn(cpf, 'isValid')
+
+    sut.isValid('any_cpfCnp')
+
+    expect(cpfCnpjValidatorSpy).toHaveBeenCalledWith('any_cpfCnp')
+  })
 })
