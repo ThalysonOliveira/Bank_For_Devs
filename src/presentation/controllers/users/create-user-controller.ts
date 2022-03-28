@@ -1,10 +1,13 @@
 import { CreateUser } from '../../../domain/useCases/users/create-user'
 import { badRequest, created, serverError } from '../../helpers/http-helpers'
-import { CnpjValidator } from '../../protocols/cnpj-validator'
-import { Controller } from '../../protocols/controller'
-import { CpfValidator } from '../../protocols/cpf-validator'
-import { EmailValidator } from '../../protocols/email-validator'
-import { HttpRequest, HttpResponse } from '../../protocols/http'
+import {
+  CnpjValidator,
+  Controller,
+  CpfValidator,
+  EmailValidator,
+  HttpRequest,
+  HttpResponse
+} from '../../protocols'
 
 class CreateUserController implements Controller {
   constructor (

@@ -1,9 +1,7 @@
 import { User } from '../../../domain/models/user'
 import { CreateUser, UserData } from '../../../domain/useCases/users/create-user'
 import { badRequest, created, serverError } from '../../helpers/http-helpers'
-import { CnpjValidator } from '../../protocols/cnpj-validator'
-import { CpfValidator } from '../../protocols/cpf-validator'
-import { EmailValidator } from '../../protocols/email-validator'
+import { CnpjValidator, CpfValidator, EmailValidator } from '../../protocols'
 import { CreateUserController } from './create-user-controller'
 
 type SutTypes = {
