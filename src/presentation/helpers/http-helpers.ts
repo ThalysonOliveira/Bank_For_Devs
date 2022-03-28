@@ -11,6 +11,15 @@ const badRequest = (message: string, data?: unknown): HttpResponse => {
   })
 }
 
+const created = (message?: string): HttpResponse => {
+  return ({
+    statusCode: 201,
+    body: {
+      message
+    }
+  })
+}
+
 const serverError = (error?: Error):HttpResponse => {
   console.log(error?.stack)
 
@@ -22,4 +31,4 @@ const serverError = (error?: Error):HttpResponse => {
   })
 }
 
-export { badRequest, serverError }
+export { badRequest, serverError, created }

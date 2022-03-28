@@ -1,5 +1,5 @@
 import { CreateUser } from '../../../domain/useCases/users/create-user'
-import { badRequest, serverError } from '../../helpers/http-helpers'
+import { badRequest, created, serverError } from '../../helpers/http-helpers'
 import { CnpjValidator } from '../../protocols/cnpj-validator'
 import { Controller } from '../../protocols/controller'
 import { CpfValidator } from '../../protocols/cpf-validator'
@@ -42,9 +42,7 @@ class CreateUserController implements Controller {
 
       await this.createUser.execute({ name, email, cpfCnpj, password })
 
-      return {
-        statusCode: 201
-      }
+      return created('User created successfully')
     } catch (error) {
       return serverError(error as Error)
     }

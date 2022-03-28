@@ -1,6 +1,6 @@
 import { User } from '../../../domain/models/user'
 import { CreateUser, UserData } from '../../../domain/useCases/users/create-user'
-import { badRequest, serverError } from '../../helpers/http-helpers'
+import { badRequest, created, serverError } from '../../helpers/http-helpers'
 import { CnpjValidator } from '../../protocols/cnpj-validator'
 import { CpfValidator } from '../../protocols/cpf-validator'
 import { EmailValidator } from '../../protocols/email-validator'
@@ -395,6 +395,6 @@ describe('Create User Controller', () => {
 
     const httpResponse = await sut.handle(httpRequest)
 
-    expect(httpResponse.statusCode).toBe(201)
+    expect(httpResponse).toEqual(created('User created successfully'))
   })
 })
