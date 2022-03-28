@@ -9,9 +9,13 @@ jest.mock('cpf-cnpj-validator', () => ({
   }
 }))
 
+const makeSut = (): CnpjValidatorAdapter => {
+  return new CnpjValidatorAdapter()
+}
+
 describe('Cnpj Validator Adapter', () => {
   test('Should return false if cpf-cnpj-validator return false', () => {
-    const sut = new CnpjValidatorAdapter()
+    const sut = makeSut()
 
     jest.spyOn(cnpj, 'isValid').mockReturnValueOnce(false)
 
@@ -21,7 +25,7 @@ describe('Cnpj Validator Adapter', () => {
   })
 
   test('Should return true if cpf-cnpj-validator return true', () => {
-    const sut = new CnpjValidatorAdapter()
+    const sut = makeSut()
 
     const isValid = sut.isValid('valid_cnpj')
 
