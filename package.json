@@ -18,5 +18,8 @@
   },
   "scripts": {
     "test": "jest  --watchAll --passWithNoTests"
+  },
+  "dependencies": {
+    "cpf-cnpj-validator": "^1.0.3"
   }
 }
