@@ -6,9 +6,9 @@ class CreateBankAccountService implements CreateBankAccount {
   constructor (private createBankAccountRepository: CreateBankAccountRepository) {}
 
   async execute () : Promise<BankAccount> {
-    await this.createBankAccountRepository.execute()
+    const bankAccount = await this.createBankAccountRepository.execute()
 
-    return new Promise((resolve) => resolve(null as unknown as BankAccount))
+    return bankAccount
   };
 }
 
