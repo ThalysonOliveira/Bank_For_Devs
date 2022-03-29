@@ -44,4 +44,15 @@ describe('Create Bank Account', () => {
 
     expect(createBankAccountRepositoryStubSpy).toHaveBeenCalled()
   })
+
+  test('Should throw if CreateBankAccountRepository throws', async () => {
+    const { sut, createBankAccountRepositoryStub } = makeSut()
+
+    jest.spyOn(createBankAccountRepositoryStub, 'execute')
+      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.execute()
+
+    await expect(promise).rejects.toThrow()
+  })
 })
