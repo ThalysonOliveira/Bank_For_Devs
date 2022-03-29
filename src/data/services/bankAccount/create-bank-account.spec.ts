@@ -17,7 +17,7 @@ const makeCreateBankAccountRepositoryStub = (): CreateBankAccountRepository => {
         agency: 1,
         number: 1,
         balance: 0,
-        created_at: new Date()
+        created_at: 'any_data' as unknown as Date
       }
 
       return new Promise(resolve => resolve(fakeBankAccount))
@@ -54,5 +54,21 @@ describe('Create Bank Account', () => {
     const promise = sut.execute()
 
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should return an bank account on success ', async () => {
+    const { sut } = makeSut()
+
+    const bankAccount = await sut.execute()
+
+    expect(bankAccount).toEqual({
+      id: 1,
+      name: 'radon_name',
+      type: 'any_type',
+      agency: 1,
+      number: 1,
+      balance: 0,
+      created_at: 'any_data' as unknown as Date
+    })
   })
 })
