@@ -40,4 +40,22 @@ describe('Create User Service', () => {
 
     expect(encrypterStubSpy).toHaveBeenCalledWith('any_password')
   })
+
+  test('Should throw if Encrypter throws', async () => {
+    const { sut, encrypterStub } = makeSut()
+
+    const userData = {
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    }
+
+    jest.spyOn(encrypterStub, 'encrypt')
+      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.execute(userData)
+
+    await expect(promise).rejects.toThrow()
+  })
 })
