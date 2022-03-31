@@ -98,4 +98,22 @@ describe('Create User Service', () => {
 
     expect(createBankAccountSpy).toHaveBeenCalled()
   })
+
+  test('Should throw if CreateBankAccount throws', async () => {
+    const { sut, createBankAccountStub } = makeSut()
+
+    const userData = {
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    }
+
+    jest.spyOn(createBankAccountStub, 'execute')
+      .mockImplementationOnce(() => { throw new Error() })
+
+    const promise = sut.execute(userData)
+
+    await expect(promise).rejects.toThrow()
+  })
 })
