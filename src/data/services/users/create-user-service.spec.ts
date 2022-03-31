@@ -1,9 +1,12 @@
+import { BankAccount } from '../../../domain/models/bank-account'
+import { CreateBankAccount } from '../../../domain/useCases/bankAccount/create-bank-account'
 import { Encrypter } from '../../protocols/encrypter'
 import { CreateUserService } from './create-user-service'
 
 type SutTypes = {
   sut: CreateUserService
   encrypterStub: Encrypter
+  createBankAccountStub: CreateBankAccount
 }
 
 const makeEncrypter = (): Encrypter => {
@@ -15,12 +18,32 @@ const makeEncrypter = (): Encrypter => {
   return new EncrypterStub()
 }
 
+const makeCreateBankAccount = (): CreateBankAccount => {
+  class CreateBankAccountStub implements CreateBankAccount {
+    async execute () :Promise<BankAccount> {
+      const fakeBankAccount = {
+        id: 1,
+        name: 'radon_name',
+        type: 'any_type',
+        agency: 1,
+        number: 1,
+        balance: 0,
+        created_at: 'any_data' as unknown as Date
+      }
+      return new Promise(resolve => resolve(fakeBankAccount))
+    }
+  }
+  return new CreateBankAccountStub()
+}
+
 const makeSut = (): SutTypes => {
   const encrypterStub = makeEncrypter()
 
-  const sut = new CreateUserService(encrypterStub)
+  const createBankAccountStub = makeCreateBankAccount()
 
-  return { sut, encrypterStub }
+  const sut = new CreateUserService(encrypterStub, createBankAccountStub)
+
+  return { sut, encrypterStub, createBankAccountStub }
 }
 
 describe('Create User Service', () => {
@@ -57,5 +80,22 @@ describe('Create User Service', () => {
     const promise = sut.execute(userData)
 
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call CreateBankAccount with success', async () => {
+    const { sut, createBankAccountStub } = makeSut()
+
+    const userData = {
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    }
+
+    const createBankAccountSpy = jest.spyOn(createBankAccountStub, 'execute')
+
+    await sut.execute(userData)
+
+    expect(createBankAccountSpy).toHaveBeenCalled()
   })
 })
