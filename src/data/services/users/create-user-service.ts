@@ -15,13 +15,17 @@ class CreateUserService implements CreateUser {
   ) {}
 
   async execute (userData: UserData): Promise<User> {
-    await this.encrypter.encrypt(userData.password)
+    const hashedPassword = await this.encrypter.encrypt(userData.password)
 
-    this.createBankAccount.execute()
+    Object.assign(userData, { password: hashedPassword })
 
-    await this.createUserRepository.execute(userData)
+    const bankAccount = await this.createBankAccount.execute()
 
-    return new Promise(resolve => resolve(null as unknown as User))
+    const user = await this.createUserRepository.execute(userData)
+
+    Object.assign(user, { id_bank_account: bankAccount.id })
+
+    return user
   }
 }
 
