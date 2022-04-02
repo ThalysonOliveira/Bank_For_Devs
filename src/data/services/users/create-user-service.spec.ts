@@ -2,20 +2,23 @@ import { BankAccount } from '../../../domain/models/bank-account'
 import { CreateBankAccount } from '../../../domain/useCases/bankAccount/create-bank-account'
 import { UserEntity } from '../../entities/user'
 import { Encrypter } from '../../protocols/encrypter'
-import { CreateUserRepository, UserEntityData } from '../../repositories/users/create-user-repository'
+import {
+  CreateUserRepository,
+  UserEntityData
+} from '../../repositories/users/create-user-repository'
 import { CreateUserService } from './create-user-service'
 
 type SutTypes = {
-  sut: CreateUserService
-  encrypterStub: Encrypter
-  createBankAccountStub: CreateBankAccount
-  createUserRepositoryStub: CreateUserRepository
-}
+  sut: CreateUserService;
+  encrypterStub: Encrypter;
+  createBankAccountStub: CreateBankAccount;
+  createUserRepositoryStub: CreateUserRepository;
+};
 
 const makeEncrypter = (): Encrypter => {
   class EncrypterStub implements Encrypter {
     async encrypt (): Promise<string> {
-      return new Promise(resolve => resolve('hashed_password'))
+      return new Promise((resolve) => resolve('hashed_password'))
     }
   }
   return new EncrypterStub()
@@ -23,7 +26,7 @@ const makeEncrypter = (): Encrypter => {
 
 const makeCreateBankAccount = (): CreateBankAccount => {
   class CreateBankAccountStub implements CreateBankAccount {
-    async execute () :Promise<BankAccount> {
+    async execute (): Promise<BankAccount> {
       const fakeBankAccount = {
         id: 1,
         name: 'radon_name',
@@ -33,7 +36,7 @@ const makeCreateBankAccount = (): CreateBankAccount => {
         balance: 0,
         created_at: 'any_data' as unknown as Date
       }
-      return new Promise(resolve => resolve(fakeBankAccount))
+      return new Promise((resolve) => resolve(fakeBankAccount))
     }
   }
   return new CreateBankAccountStub()
@@ -43,15 +46,15 @@ const makeCreateUserRepository = (): CreateUserRepository => {
   class CreateUserRepositoryStub implements CreateUserRepository {
     async execute (userEntityData: UserEntityData): Promise<UserEntity> {
       const fakeUser = {
-        id: Number('any_id'),
+        id: 1,
         name: 'any_name',
         email: 'any_email',
         cpfCnpj: 'any_cpfCnpj',
-        password: 'any_password',
-        id_bank_account: Number('any_id_bank_account')
+        password: 'hashed_password',
+        id_bank_account: 1
       }
 
-      return new Promise(resolve => resolve(fakeUser))
+      return new Promise((resolve) => resolve(fakeUser))
     }
   }
 
@@ -107,8 +110,11 @@ describe('Create User Service', () => {
       password: 'any_password'
     }
 
-    jest.spyOn(encrypterStub, 'encrypt')
-      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    jest
+      .spyOn(encrypterStub, 'encrypt')
+      .mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
 
     const promise = sut.execute(userData)
 
@@ -142,8 +148,9 @@ describe('Create User Service', () => {
       password: 'any_password'
     }
 
-    jest.spyOn(createBankAccountStub, 'execute')
-      .mockImplementationOnce(() => { throw new Error() })
+    jest.spyOn(createBankAccountStub, 'execute').mockImplementationOnce(() => {
+      throw new Error()
+    })
 
     const promise = sut.execute(userData)
 
@@ -160,7 +167,10 @@ describe('Create User Service', () => {
       password: 'any_password'
     }
 
-    const createUserRepositorySpy = jest.spyOn(createUserRepositoryStub, 'execute')
+    const createUserRepositorySpy = jest.spyOn(
+      createUserRepositoryStub,
+      'execute'
+    )
 
     await sut.execute(userData)
 
@@ -168,7 +178,7 @@ describe('Create User Service', () => {
       name: 'any_name',
       email: 'any_email',
       cpfCnpj: 'any_cpfCnpj',
-      password: 'any_password'
+      password: 'hashed_password'
     })
   })
 
@@ -179,14 +189,39 @@ describe('Create User Service', () => {
       name: 'any_name',
       email: 'any_email',
       cpfCnpj: 'any_cpfCnpj',
-      password: 'any_password'
+      password: 'hashed_password'
     }
 
-    jest.spyOn(createUserRepositoryStub, 'execute')
-      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    jest
+      .spyOn(createUserRepositoryStub, 'execute')
+      .mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
 
     const promise = sut.execute(userData)
 
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should return a user on success', async () => {
+    const { sut } = makeSut()
+
+    const userData = {
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    }
+
+    const user = await sut.execute(userData)
+
+    expect(user).toEqual({
+      id: 1,
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'hashed_password',
+      id_bank_account: 1
+    })
   })
 })
