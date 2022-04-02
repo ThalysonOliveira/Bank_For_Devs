@@ -1,12 +1,15 @@
 import { BankAccount } from '../../../domain/models/bank-account'
 import { CreateBankAccount } from '../../../domain/useCases/bankAccount/create-bank-account'
+import { UserEntity } from '../../entities/user'
 import { Encrypter } from '../../protocols/encrypter'
+import { CreateUserRepository, UserEntityData } from '../../repositories/users/create-user-repository'
 import { CreateUserService } from './create-user-service'
 
 type SutTypes = {
   sut: CreateUserService
   encrypterStub: Encrypter
   createBankAccountStub: CreateBankAccount
+  createUserRepositoryStub: CreateUserRepository
 }
 
 const makeEncrypter = (): Encrypter => {
@@ -36,14 +39,44 @@ const makeCreateBankAccount = (): CreateBankAccount => {
   return new CreateBankAccountStub()
 }
 
+const makeCreateUserRepository = (): CreateUserRepository => {
+  class CreateUserRepositoryStub implements CreateUserRepository {
+    async execute (userEntityData: UserEntityData): Promise<UserEntity> {
+      const fakeUser = {
+        id: Number('any_id'),
+        name: 'any_name',
+        email: 'any_email',
+        cpfCnpj: 'any_cpfCnpj',
+        password: 'any_password',
+        id_bank_account: Number('any_id_bank_account')
+      }
+
+      return new Promise(resolve => resolve(fakeUser))
+    }
+  }
+
+  return new CreateUserRepositoryStub()
+}
+
 const makeSut = (): SutTypes => {
   const encrypterStub = makeEncrypter()
 
   const createBankAccountStub = makeCreateBankAccount()
 
-  const sut = new CreateUserService(encrypterStub, createBankAccountStub)
+  const createUserRepositoryStub = makeCreateUserRepository()
 
-  return { sut, encrypterStub, createBankAccountStub }
+  const sut = new CreateUserService(
+    encrypterStub,
+    createBankAccountStub,
+    createUserRepositoryStub
+  )
+
+  return {
+    sut,
+    encrypterStub,
+    createBankAccountStub,
+    createUserRepositoryStub
+  }
 }
 
 describe('Create User Service', () => {
@@ -115,5 +148,27 @@ describe('Create User Service', () => {
     const promise = sut.execute(userData)
 
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call CreateUserRepository with correct values', async () => {
+    const { sut, createUserRepositoryStub } = makeSut()
+
+    const userData = {
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    }
+
+    const createUserRepositorySpy = jest.spyOn(createUserRepositoryStub, 'execute')
+
+    await sut.execute(userData)
+
+    expect(createUserRepositorySpy).toHaveBeenCalledWith({
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    })
   })
 })
