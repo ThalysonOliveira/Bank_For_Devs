@@ -171,4 +171,22 @@ describe('Create User Service', () => {
       password: 'any_password'
     })
   })
+
+  test('Should throw if CreateUserRepository throws', async () => {
+    const { sut, createUserRepositoryStub } = makeSut()
+
+    const userData = {
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    }
+
+    jest.spyOn(createUserRepositoryStub, 'execute')
+      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.execute(userData)
+
+    await expect(promise).rejects.toThrow()
+  })
 })
