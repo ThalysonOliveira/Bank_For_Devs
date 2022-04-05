@@ -1,6 +1,7 @@
 import { BankAccount } from '../../../domain/models/bank-account'
 import { CreateBankAccount } from '../../../domain/useCases/bankAccount/create-bank-account'
 import { UserEntity } from '../../entities/user'
+import { SendAccountCreationEmail } from '../../protocols/email/account-creation-email'
 import { Encrypter } from '../../protocols/encrypter'
 import {
   CreateUserRepository,
@@ -13,7 +14,18 @@ type SutTypes = {
   encrypterStub: Encrypter;
   createBankAccountStub: CreateBankAccount;
   createUserRepositoryStub: CreateUserRepository;
+  sendAccountCreationEmailStub: SendAccountCreationEmail
 };
+
+const makeSendAccountCreationEmail = (): SendAccountCreationEmail => {
+  class SendAccountCreationEmailStub implements SendAccountCreationEmail {
+    async execute (): Promise<void> {
+      return new Promise((resolve) => resolve())
+    }
+  }
+
+  return new SendAccountCreationEmailStub()
+}
 
 const makeEncrypter = (): Encrypter => {
   class EncrypterStub implements Encrypter {
@@ -68,17 +80,21 @@ const makeSut = (): SutTypes => {
 
   const createUserRepositoryStub = makeCreateUserRepository()
 
+  const sendAccountCreationEmailStub = makeSendAccountCreationEmail()
+
   const sut = new CreateUserService(
     encrypterStub,
     createBankAccountStub,
-    createUserRepositoryStub
+    createUserRepositoryStub,
+    sendAccountCreationEmailStub
   )
 
   return {
     sut,
     encrypterStub,
     createBankAccountStub,
-    createUserRepositoryStub
+    createUserRepositoryStub,
+    sendAccountCreationEmailStub
   }
 }
 
@@ -155,6 +171,23 @@ describe('Create User Service', () => {
     const promise = sut.execute(userData)
 
     await expect(promise).rejects.toThrow()
+  })
+
+  test('Should call SendAccountCreationEmail', async () => {
+    const { sut, sendAccountCreationEmailStub } = makeSut()
+
+    const userData = {
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    }
+
+    const sendAccountCreationEmailSpy = jest.spyOn(sendAccountCreationEmailStub, 'execute')
+
+    await sut.execute(userData)
+
+    expect(sendAccountCreationEmailSpy).toBeCalled()
   })
 
   test('Should call CreateUserRepository with correct values', async () => {
