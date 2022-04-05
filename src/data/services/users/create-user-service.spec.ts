@@ -190,6 +190,25 @@ describe('Create User Service', () => {
     expect(sendAccountCreationEmailSpy).toBeCalled()
   })
 
+  test('Should throw if SendAccountCreationEmail throws', async () => {
+    const { sut, sendAccountCreationEmailStub } = makeSut()
+
+    const userData = {
+      name: 'any_name',
+      email: 'any_email',
+      cpfCnpj: 'any_cpfCnpj',
+      password: 'any_password'
+    }
+
+    jest
+      .spyOn(sendAccountCreationEmailStub, 'execute')
+      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+
+    const promise = sut.execute(userData)
+
+    await expect(promise).rejects.toThrow()
+  })
+
   test('Should call CreateUserRepository with correct values', async () => {
     const { sut, createUserRepositoryStub } = makeSut()
 
